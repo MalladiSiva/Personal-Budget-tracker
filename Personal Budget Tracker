@@ -1,0 +1,70 @@
+import os
+import json
+
+class BudgetTracker:
+    def __init__(self):
+        self.transactions = self.load_transactions()
+        self.income = 0
+        self.expenses = {}
+
+    def load_transactions(self):
+        if os.path.exists("transactions.json"):
+            with open("transactions.json", "r") as f:
+                return json.load(f)
+        else:
+            return []
+
+    def save_transactions(self):
+        with open("transactions.json", "w") as f:
+            json.dump(self.transactions, f)
+
+    def add_income(self):
+        amount = float(input("Enter income amount: "))
+        self.income += amount
+        self.transactions.append({"type": "income", "amount": amount})
+
+    def add_expense(self):
+        category = input("Enter expense category: ")
+        amount = float(input("Enter expense amount: "))
+        self.expenses[category] = self.expenses.get(category, 0) + amount
+        self.transactions.append({"type": "expense", "category": category, "amount": amount})
+
+    def calculate_budget(self):
+        total_expenses = sum(self.expenses.values())
+        remaining_budget = self.income - total_expenses
+        return remaining_budget
+
+    def analyze_expenses(self):
+        for category, amount in self.expenses.items():
+            print(f"Category: {category}, Amount: {amount:.2f}")
+
+    def display_budget(self):
+        remaining_budget = self.calculate_budget()
+        print(f"Remaining budget: {remaining_budget:.2f}")
+
+    def run(self):
+        while True:
+            print("\n1. Add income")
+            print("2. Add expense")
+            print("3. Display budget")
+            print("4. Analyze expenses")
+            print("5. Quit")
+            choice = input("Enter your choice: ")
+            if choice == "1":
+                self.add_income()
+            elif choice == "2":
+                self.add_expense()
+            elif choice == "3":
+                self.display_budget()
+            elif choice == "4":
+                self.analyze_expenses()
+            elif choice == "5":
+                self.save_transactions()
+                print("Exiting...")
+                break
+            else:
+                print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    tracker = BudgetTracker()
+    tracker.run()
